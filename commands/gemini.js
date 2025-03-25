@@ -16,7 +16,7 @@ module.exports = {
 
         let imageUrl = null;
 
-        // Check if user replied to an image
+      
 
         if (event.messageReply && event.messageReply.attachments.length > 0) {
 

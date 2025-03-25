@@ -1,3 +1,5 @@
+// THIS COMMAND IS USING GOOGLE API FOR TRANSLATE 
+
 const axios = require("axios");
 
 const fs = require("fs");

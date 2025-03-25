@@ -14,8 +14,8 @@ module.exports = {
       });
     }
 
-    const language = args.shift(); // Extract language code
-    const text = args.join(" "); // Remaining text to translate
+    const language = args.shift();
+    const text = args.join(" ");
 
     try {
       const response = await axios.post("https://libretranslate.de/translate", {

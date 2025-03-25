@@ -16,7 +16,7 @@ module.exports = {
 
         const { threadID, messageID, body } = event;
 
-        // Check for "yamete" (case-insensitive)
+  
 
         if (/^yamete/i.test(body)) {
 

@@ -16,7 +16,7 @@ module.exports = {
         let query = args.join(" ");
         let imageUrl = null;
 
-        // If the message is a reply with an image, get the image URL
+        
         if (messageReply && messageReply.attachments.length > 0) {
             const imageAttachment = messageReply.attachments.find(att => att.type === 'photo');
             if (imageAttachment) {
@@ -24,7 +24,7 @@ module.exports = {
             }
         }
 
-        // If the message contains an image, get the image URL
+    
         if (attachments.length > 0) {
             const imageAttachment = attachments.find(att => att.type === 'photo');
             if (imageAttachment) {
@@ -32,7 +32,7 @@ module.exports = {
             }
         }
 
-        // Build the API URL
+      
         const imageUrlParam = imageUrl ? `&imageUrl=${encodeURIComponent(imageUrl)}` : '';
         const apiUrl = `https://kaiz-apis.gleeze.com/api/gpt-4o-pro?ask=${encodeURIComponent(query)}&uid=${senderID}${imageUrlParam}`;
 
@@ -45,7 +45,7 @@ module.exports = {
 
             const aiResponse = response.data.response;
 
-            // Check if the response contains an image URL
+          
             const imageUrlMatch = aiResponse.match(/(https?:\/\/[^\s)]+)/);
             const extractedImageUrl = imageUrlMatch ? imageUrlMatch[1] : null;
 

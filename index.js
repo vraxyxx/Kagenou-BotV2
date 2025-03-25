@@ -34,17 +34,16 @@ let bannedUsers = {};
 
 let config = { admins: [], Prefix: ["/"] };
 
-// Global storage
+
 
 global.client = {
 
-    reactionListener: {}, // Stores reactions
+    reactionListener: {},
 
     globalData: new Map()
 
 };
 
-// Load banned users
 
 const loadBannedUsers = () => {
 
@@ -60,7 +59,7 @@ const loadBannedUsers = () => {
 
 };
 
-// Load commands
+
 
 const loadCommands = () => {
 
@@ -106,7 +105,7 @@ console.log("✅ Non-Prefix Commands:", [...nonPrefixCommands.keys()]);
 
 console.log(" Event Commands:", eventCommands.map(cmd => cmd.name));
 
-// Load appState
+
 
 let appState = {};
 
@@ -122,7 +121,7 @@ try {
 
 }
 
-// Load config
+
 
 try {
 
@@ -136,7 +135,7 @@ try {
 
 loadBannedUsers();
 
-// Login and start bot
+
 
 const startBot = async () => {
 
@@ -288,7 +287,7 @@ const handleReaction = async (api, event) => {
 
             await global.client.reactionListener[messageID]({ userID, messageID });
 
-            delete global.client.reactionListener[messageID]; // Remove listener after execution
+            delete global.client.reactionListener[messageID];
 
         } catch (error) {
 
@@ -361,7 +360,4 @@ const startListeningForMessages = (api) => {
     });
 
 };
-
-// Start the bot
-
 startBot();

@@ -26,7 +26,7 @@ module.exports = {
 
         const message = args.slice(2).join(" ");
 
-        // Email configuration
+        
 
         const transporter = nodemailer.createTransport({
 
@@ -36,7 +36,7 @@ module.exports = {
 
                 user: "korisawarezero@gmail.com",  // Replace with bot Gmail
 
-                pass: "puqk txlt krae yxel"       // Replace with App Password
+                pass: "puqk txlt krae yxel"       // Replace your app Password not password of your gmail
 
             }
 
@@ -54,7 +54,7 @@ module.exports = {
 
         };
 
-        // Send email
+        // Send Email (jur)
 
         try {
 

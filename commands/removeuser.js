@@ -17,20 +17,18 @@ module.exports = {
         }
 
         let userIDToRemove;
-        // Attempt to parse user ID or username mention
+        
         if (args[1].startsWith('@')) {
-          //Extract username from mention, you might need to adapt this based on your mention format.
+
           const username = args[1].substring(1);
-          //This part requires additional logic to fetch the userID from the username.
-          //You'll likely need to use the fca API to search for users by name and find the correct match.
-          //This is a complex operation and may require multiple API calls and error handling.  See example below.
+        
           try {
             const users = await api.searchForUsers(username);
             if (users.length === 0) {
               sendMessage(api, { threadID, message: `User '${username}' not found.` });
               return;
             }
-            //Assuming a single user is found, use the first result's id.  Handle multiple matches appropriately.
+            
             userIDToRemove = users[0].userID;
           } catch (error) {
             sendMessage(api, { threadID, message: `Error searching for user: ${error.message}` });

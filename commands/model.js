@@ -122,13 +122,11 @@ module.exports = {
 
       const url = `${models[model]}${encodeURIComponent(prompt)}&uid=${senderID}`;
 
-      console.log(`🌐 Fetching API: ${url}`); // Log API call
+      console.log(`🌐 Fetching API: ${url}`);
 
       const response = await axios.get(url);
 
-      console.log(`✅ API Response for ${model}:`, response.data); // Debugging log
-
-      // Extract response
+      console.log(`✅ API Response for ${model}:`, response.data); 
 
       const reply =
 

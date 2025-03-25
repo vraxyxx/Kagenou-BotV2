@@ -8,19 +8,19 @@ module.exports = {
   execute: async (api, event, args, commands, prefix, admins, appState, sendMessage) => {
     const { threadID, messageID, senderID, attachments } = event;
 
-    // User ID (random for now, you can change this to track users)
+  
     const userID = senderID || Math.floor(Math.random() * 10000);
     
-    // Construct the API URL
+
     const question = args.join(" ") || "Hello";
     let apiUrl = `https://kaiz-apis.gleeze.com/api/deepseek-v3?ask=${encodeURIComponent(question)}&uid=${userID}`;
 
     try {
       if (attachments && attachments.length > 0) {
-        // Handle image recognition
-        const image = attachments[0]; // Get the first attached image
+      
+        const image = attachments[0];
         if (image.type === "photo") {
-          // Download the image to a temp file
+        
           const tempFilePath = path.join(__dirname, "temp_image.jpg");
           const imageStream = fs.createWriteStream(tempFilePath);
 
@@ -28,7 +28,7 @@ module.exports = {
           imageRequest.data.pipe(imageStream);
 
           imageStream.on("finish", async () => {
-            // Now send the image for recognition (assuming the API supports image uploads)
+            
             const formData = new FormData();
             formData.append("file", fs.createReadStream(tempFilePath));
 
@@ -43,7 +43,7 @@ module.exports = {
           sendMessage(api, { threadID, message: "❌ Please send an image!" });
         }
       } else {
-        // Handle text query
+        
         const response = await axios.get(apiUrl);
         sendMessage(api, { threadID, message: response.data.response || "I couldn't understand your question." });
       }

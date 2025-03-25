@@ -5,7 +5,7 @@ module.exports = {
     description: 'Ask Claude 3 AI any question.',
     async execute(api, event, args, commands, prefix, admins, appState, sendMessage) {
         const { threadID } = event;
-        const query = args.slice(1).join(' '); // Remove the command itself from args
+        const query = args.slice(1).join(' '); 
 
         if (!query) {
             return sendMessage(api, { threadID, message: 'Please provide a question.\nExample: /claude What is AI?' });

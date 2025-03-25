@@ -15,7 +15,7 @@ module.exports = {
 
         const { threadID, messageID, body } = event;
 
-        // Check for "dog" (case-insensitive)
+        
 
         if (/^dog/i.test(body)) {
 

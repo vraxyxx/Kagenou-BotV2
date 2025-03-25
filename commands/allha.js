@@ -14,7 +14,6 @@ module.exports = {
 
         const { threadID, messageID, body } = event;
 
-        // Check for "yamete" (case-insensitive)
 
         if (/^allha/i.test(body)) {
 

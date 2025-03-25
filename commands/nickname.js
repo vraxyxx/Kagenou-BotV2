@@ -24,7 +24,7 @@ module.exports = {
 
                 
 
-                // Set bot's nickname
+          
 
                 api.changeNickname(botName, event.threadID, botID, (err) => {
 

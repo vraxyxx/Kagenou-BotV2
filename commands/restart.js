@@ -9,7 +9,7 @@ module.exports = {
         }
         sendMessage(api, { threadID, message: 'Restarting...' });
         setTimeout(() => {
-            process.exit(0); // Exit the process cleanly
-        }, 1000); // Add a 1-second delay before exiting
+            process.exit(0);
+        }, 1000); 
     }
 };

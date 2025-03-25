@@ -1,3 +1,5 @@
+// THIS AI COMMAND IS CONVERTED BY JUN JAAM AND ME OFC, BUT THANKS 
+
 const { post } = require("axios");
 
 module.exports = {
@@ -8,7 +10,7 @@ module.exports = {
 
     description: "AI chatbot with multiple assistant personalities and models.",
 
-    usage: "ai | <message>",
+    usage: "ai  <message>",
 
     async run({ api, event, usersData, globalData }) {
 
@@ -46,7 +48,7 @@ module.exports = {
 
         const gender = userData.gender === 2 ? "male" : "female";
 
-        // If user types only "/ai", show assistant options
+       
 
         if (args.length === 1) {
 
@@ -66,7 +68,7 @@ module.exports = {
 
         }
 
-        // Handle setting assistant type
+     
 
         if (args.length >= 3 && args[1].toLowerCase() === "set") {
 
@@ -108,15 +110,14 @@ module.exports = {
 
         }
 
-        // Handling image/video/audio replies
-
+      
         const msg = event.messageReply;
 
         let url = undefined;
 
         if (msg && msg.attachments?.length > 0) {
 
-            const attachment = msg.attachments[0]; // Get the first attachment
+            const attachment = msg.attachments[0];
 
             if (["photo", "video", "audio", "sticker"].includes(attachment.type)) {
 
@@ -134,7 +135,7 @@ module.exports = {
 
         }
 
-        // If user asks AI something, but there's no text or media, show error
+       
 
         const prompt = args.slice(1).join(" ");
 
@@ -156,7 +157,7 @@ module.exports = {
 
                 name: userName,
 
-                system: systemType, // Use stored system type
+                system: systemType, 
 
                 gender,
 
@@ -164,7 +165,7 @@ module.exports = {
 
                 nsfw: Gpt.data.nsfw,
 
-                link: url // Pass the attachment URL
+                link: url
 
             });
 

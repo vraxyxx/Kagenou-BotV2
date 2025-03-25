@@ -12,7 +12,7 @@ module.exports = {
             return sendMessage(api, { threadID, message: "❌ | You do not have permission to use this command." });
         }
 
-        // Check if UID and message are provided
+      
         const userID = args[1];
         const messageContent = args.slice(1).join(" ");
 
@@ -23,14 +23,14 @@ module.exports = {
             return sendMessage(api, { threadID, message: "⚠️ | Please provide a **message** to send." });
         }
 
-        // Formatted anonymous message
+      
         const formattedMessage = `📩 | Message from an anonymous person\n\n${messageContent}\n\n___________________________________________________\n📒: *This bot is for educational purposes only.*`;
 
         try {
-            // Send the message to the specified user
+          
             await sendMessage(api, { threadID: userID, message: formattedMessage });
 
-            // Confirm the message was sent
+            
             sendMessage(api, { threadID, message: `✅ | Your message has been sent to **${userID}**.` });
         } catch (error) {
             console.error("Error sending message:", error);

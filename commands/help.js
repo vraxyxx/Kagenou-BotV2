@@ -96,7 +96,7 @@ module.exports = {
 
     helpMessage += `Facebook: https://www.facebook.com/aljur.pogoy.2024`;
 
-    // Send the help message
+  
 
     sendMessage(api, { threadID, message: helpMessage });
 

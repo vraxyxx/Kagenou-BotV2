@@ -8,7 +8,7 @@ module.exports = {
 
         const { threadID, senderID } = event;
 
-        const newAdminID = args[0]; // Change args[1] to args[0]
+        const newAdminID = args[0];
 
         if (!admins.includes(senderID)) {
 

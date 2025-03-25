@@ -22,7 +22,7 @@ module.exports = {
 
             .sort((a, b) => (b.balance + b.bank) - (a.balance + a.bank))
 
-            .slice(0, 10); // Top 10 richest
+            .slice(0, 10); // Top 10
 
         let message = "💰Top Richest Players:\n\n";
 

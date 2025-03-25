@@ -4,8 +4,6 @@ const path = require("path");
 
 const bannedUsersFile = path.join(__dirname, "../database/bannedUsers.json");
 
-// Load banned users
-
 const loadBannedUsers = () => {
 
     try {
@@ -42,7 +40,7 @@ module.exports = {
 
         let bannedUsers = loadBannedUsers();
 
-        // Ensure command format is correct
+      
 
         const parts = body.split("|").map(part => part.trim());
 
@@ -52,11 +50,11 @@ module.exports = {
 
         }
 
-        const userID = parts[1]; // Extract the user ID
+        const userID = parts[1];
 
-        const reason = parts.slice(2).join(" "); // Extract reason
+        const reason = parts.slice(2).join(" "); 
 
-        // Validate user ID
+        
 
         if (!/^\d+$/.test(userID)) {
 
@@ -64,7 +62,7 @@ module.exports = {
 
         }
 
-        // Prevent banning an already banned user
+  
 
         if (bannedUsers[userID]) {
 
@@ -72,7 +70,7 @@ module.exports = {
 
         }
 
-        // Add user to banned list
+  
 
         bannedUsers[userID] = {
 

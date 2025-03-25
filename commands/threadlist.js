@@ -18,7 +18,7 @@ module.exports = {
                     return sendMessage(api, { threadID, message: "📂 No active threads found." });
                 }
 
-                // Format thread list with names and IDs
+              
                 const threadInfo = list.map(thread => `🔹 **${thread.name || "Unnamed Chat"}**\n📌 ID: ${thread.threadID}`).join("\n\n");
                 
                 const responseMessage = `📜Active Threads:\n\n${threadInfo}`;

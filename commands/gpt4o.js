@@ -16,11 +16,10 @@ module.exports = {
 
         const threadID = event.threadID;
 
-        let query = event.body.slice(7).trim(); // Remove command prefix
+        let query = event.body.slice(7).trim(); 
 
         let imageUrl = "";
 
-        // Check if the user replied to an image
 
         if (event.messageReply && event.messageReply.attachments.length > 0) {
 
@@ -28,13 +27,13 @@ module.exports = {
 
             if (attachment.type === "photo") {
 
-                imageUrl = attachment.url; // Get image URL
+                imageUrl = attachment.url; 
 
             }
 
         }
 
-        // If no query and no image, return an error
+        
 
         if (!query && !imageUrl) {
 
@@ -42,7 +41,7 @@ module.exports = {
 
         }
 
-        // API Request
+      
 
         try {
 
@@ -60,7 +59,7 @@ module.exports = {
 
             });
 
-            // Send the AI response
+            
 
             return api.sendMessage(response.data.result, threadID);
 

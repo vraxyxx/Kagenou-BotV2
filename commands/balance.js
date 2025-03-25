@@ -24,7 +24,7 @@ module.exports = {
 
         if (!balanceData[userID]) {
 
-            balanceData[userID] = { balance: 1000, bank: 0 }; // Give new users 1000 coins
+            balanceData[userID] = { balance: 1000, bank: 0 };
 
             fs.writeFileSync(balancePath, JSON.stringify(balanceData, null, 2));
 

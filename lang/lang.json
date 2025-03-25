@@ -1,9 +1,0 @@
-{
-  "en": {
-    "invalid_amount": "Please enter a valid positive amount to bet.",
-    "not_enough_money": "You don't have enough money for that bet.",
-    "jackpot_message": "Jackpot! You won $%1 with three %2 symbols!",
-    "two_match": "You won $%1 with two matching symbols!",
-    "lose_message": "You lost $%1."
-  }
-}

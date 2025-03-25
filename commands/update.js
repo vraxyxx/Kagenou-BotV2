@@ -1,3 +1,5 @@
+// THIS IS THE IMPORTANT COMMAND FOR OUR BOTFILES 
+
 const axios = require("axios");
 
 const fs = require("fs");
@@ -20,17 +22,17 @@ module.exports = {
 
         try {
 
-            // Fetch the latest update information
+            
 
             const response = await axios.get(updateUrl);
 
             const latestUpdate = response.data;
 
-            // Read the current package.json
+        
 
             const currentUpdate = JSON.parse(fs.readFileSync(updateFilePath, "utf8"));
 
-            // Compare versions
+        
 
             if (latestUpdate.version === currentUpdate.version) {
 
@@ -38,7 +40,7 @@ module.exports = {
 
             }
 
-            // List updates
+          
 
             const updateMessage = `⚡ The new update is available!\n\n` +
 

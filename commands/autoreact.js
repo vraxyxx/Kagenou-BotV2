@@ -10,8 +10,7 @@ module.exports = {
 
         if (!body) return;
 
-        // Define keywords and their corresponding reactions
-
+      
         const reactions = {
 
             "hello": "👋",
@@ -42,7 +41,7 @@ module.exports = {
 
         };
 
-        // Check if the message contains a keyword and react
+       
 
         for (const keyword in reactions) {
 

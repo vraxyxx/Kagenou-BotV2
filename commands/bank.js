@@ -16,7 +16,7 @@ module.exports = {
 
         const userID = event.senderID;
 
-        // Join all arguments and split using "|"
+    
 
         const input = args.join(" ").split("|").map(a => a.trim());
 
@@ -36,7 +36,7 @@ module.exports = {
 
         }
 
-        // Load balance data
+      
 
         let balanceData = {};
 
@@ -52,7 +52,7 @@ module.exports = {
 
         }
 
-        // Deposit Function
+      
 
         if (action === "deposit") {
 
@@ -70,7 +70,7 @@ module.exports = {
 
         }
 
-        // Withdraw Function
+        
 
         else if (action === "withdraw") {
 
@@ -88,7 +88,7 @@ module.exports = {
 
         }
 
-        // Save Updated Data
+        
 
         fs.writeFileSync(balanceFile, JSON.stringify(balanceData, null, 2));
 

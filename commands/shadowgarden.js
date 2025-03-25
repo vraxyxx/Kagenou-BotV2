@@ -24,7 +24,7 @@ module.exports = {
 
             
 
-            // Get all image files from the folder
+            
 
             const imageFiles = fs.readdirSync(folderPath).filter(file => file.endsWith(".jpg") || file.endsWith(".png"));
 
@@ -34,13 +34,13 @@ module.exports = {
 
             }
 
-            // Pick a random image
+          
 
             const randomImage = imageFiles[Math.floor(Math.random() * imageFiles.length)];
 
             const imagePath = path.join(folderPath, randomImage);
 
-            // Send the random image
+        
 
             api.sendMessage({
 
