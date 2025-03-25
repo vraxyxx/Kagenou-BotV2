@@ -56,6 +56,50 @@ module.exports = {
   async execute(api, event, args, commands, prefix, admins, appState, sendMessage) {
     const { threadID } = event;
 ```
+## To create an command fo jinwoo-system
+```node.js
+const axios = require("axios");
+
+module.exports = {
+    config: {
+        name: "ping",
+        description: "Check bot response time.",
+        usage: "/ping",
+        hasPermission: 0
+    },
+
+    onStart: async function ({ api, event }) {
+        const { threadID, messageID } = event;
+        const start = Date.now();
+
+        api.sendMessage("🏓 Pinging...", threadID, (err, info) => {
+            if (err) return;
+
+            const end = Date.now();
+            const ping = end - start;
+
+            api.editMessage(`🏓 Pong! Response time: ${ping}ms`, info.messageID);
+        });
+    }
+};
+```
+## To create an command for second-system which is the VIP system
+```node.js
+module.exports = {
+
+    name: "ping",
+
+    run: async ({ api, event }) => {
+
+        api.sendMessage("Pong!", event.threadID);
+
+    }
+
+};
+```
+## To create an command for cid-kagenou-system
+```node.js
+
 ## To handle the non-prefix comamnd
 ```node.js
 if (commandName === 'prefix' && commands.has('prefix')) {
