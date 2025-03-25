@@ -183,11 +183,3 @@ node index.js
 # Credits to ws3-fca 
 ws3-fca [Click Here](https://www.npmjs.com/package/ws3-fca)
 
-## Update 
-
-### new update January 23,2025
-
-| Command                                                | Role  | Description           |
-| ------------------------------------------------------ | ----- | --------------------- |
-| `/help`![New](https://img.shields.io/badge/-New-brightgreen)                                       | User | See the category and listed comamnds.       |
-| `/restart`                                      |Admin | Restart the bot.    |
