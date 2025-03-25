@@ -1,153 +1,367 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const fs = require('fs');
-const path = require('path');
-const login = require('ws3-fca'); // Make sure this is installed correctly
-const axios = require('axios');
+const fs = require("fs-extra");
 
-const app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+const path = require("path");
+
+const login = require("chatbox-fca-remake");
+
+const system = require("./SYSTEM/second-system#1/index.js");
+
+const tokitoSystem = require("./SYSTEM/tokito-system/index.js");
+
+const cidKagenouSystem = require("./SYSTEM/cid-kagenou-system/index.js");
+
+const jinwooSystem = require("./SYSTEM/jinwoo-system/index.js");
+
+const apiHandler = require("./utils/apiHandler");
+
+const commands = new Map();
+
+const nonPrefixCommands = new Map();
+
+const eventCommands = [];
+
+const usersData = new Map();
+
+const globalData = new Map();
+
+const commandsDir = path.join(__dirname, "commands");
+
+const bannedUsersFile = path.join(__dirname, "database", "bannedUsers.json");
+
+const configFile = path.join(__dirname, "config.json");
+
+let bannedUsers = {};
+
+let config = { admins: [], Prefix: ["/"] };
+
+// Global storage
+
+global.client = {
+
+    reactionListener: {}, // Stores reactions
+
+    globalData: new Map()
+
+};
+
+// Load banned users
+
+const loadBannedUsers = () => {
+
+    try {
+
+        bannedUsers = JSON.parse(fs.readFileSync(bannedUsersFile, "utf8"));
+
+    } catch {
+
+        bannedUsers = {};
+
+    }
+
+};
 
 // Load commands
-const commands = new Map();
-const commandsDir = path.join(__dirname, 'commands');
 
 const loadCommands = () => {
-    const commandFiles = fs.readdirSync(commandsDir).filter(file => file.endsWith('.js'));
+
+    const commandFiles = fs.readdirSync(commandsDir).filter(file => file.endsWith(".js"));
+
     for (const file of commandFiles) {
+
         try {
+
             const command = require(path.join(commandsDir, file));
-            if (command.name) {
+
+            if (command.config && command.config.name && command.run) {
+
+                commands.set(command.config.name.toLowerCase(), command);
+
+                if (command.config.nonPrefix) nonPrefixCommands.set(command.config.name.toLowerCase(), command);
+
+            } else if (command.name) { 
+
                 commands.set(command.name.toLowerCase(), command);
-            } else {
-                console.error(`Command file '${file}' is missing a 'name' property.`);
+
+                if (command.nonPrefix) nonPrefixCommands.set(command.name.toLowerCase(), command);
+
             }
+
+            if (command.handleEvent) eventCommands.push(command);
+
         } catch (error) {
-            console.error(`Error loading command '${file}':`, error);
+
+            console.error(`❌ Error loading command '${file}':`, error);
+
         }
+
     }
+
 };
 
 loadCommands();
-console.log('Commands loaded:', commands);
+
+console.log("✅ Commands loaded:", [...commands.keys()]);
+
+console.log("✅ Non-Prefix Commands:", [...nonPrefixCommands.keys()]);
+
+console.log(" Event Commands:", eventCommands.map(cmd => cmd.name));
 
 // Load appState
+
 let appState = {};
+
 try {
-    const appStateRaw = fs.readFileSync('./appstate.json', 'utf8');
-    appState = JSON.parse(appStateRaw);
-    console.log('appState loaded successfully.');
+
+    appState = JSON.parse(fs.readFileSync("./appstate.dev.json", "utf8"));
+
+    console.log("✅ appState loaded successfully.");
+
 } catch (error) {
-    console.error('Error loading appstate.json:', error);
-    // Don't exit immediately; allow the user to create appstate.json.
-    console.warn('appstate.json not found. Please login to create it.');
+
+    console.error("❌ Error loading appstate.json:", error);
+
 }
 
 // Load config
-let config = { admins: [] };
+
 try {
-    const configRaw = fs.readFileSync('./config.json', 'utf8');
-    config = JSON.parse(configRaw);
+
+    config = JSON.parse(fs.readFileSync(configFile, "utf8"));
+
 } catch (error) {
-    console.error('Error loading config.json:', error);
-    console.warn('Using default config (no admins).');
+
+    console.error("❌ Error loading config.json:", error);
+
 }
 
-const prefix = '/';
-let api = null;
+loadBannedUsers();
 
-const loginToFacebook = async () => {
-    try {
-        api = await new Promise((resolve, reject) => {
-            login({ appState }, (err, apiInstance) => {
-                if (err) reject(err);
-                else resolve(apiInstance);
-            });
-        });
-        api.setOptions({ listenEvents: true, selfListen: false });
-        console.log('Successfully logged in to Facebook.');
-        return api;
-    } catch (error) {
-        console.error('Fatal error during Facebook login:', error);
-        process.exit(1);
-    }
-};
+// Login and start bot
 
 const startBot = async () => {
-    api = await loginToFacebook();
-    startListeningForMessages();
+
+    login({ appState }, (err, api) => {
+
+        if (err) {
+
+            console.error("❌ Fatal error during Facebook login:", err);
+
+            process.exit(1);
+
+        }
+
+        api.setOptions({
+
+            forceLogin: true,
+
+            listenEvents: true,
+
+            logLevel: "silent",
+
+            updatePresence: true,
+
+            selfListen: false,
+
+            bypassRegion: "PNB",
+
+            userAgent: "Mozilla/5.0",
+
+            online: false,
+
+            autoMarkDelivery: false,
+
+            autoMarkRead: false
+
+        });
+
+        console.log("✅ Successfully logged in to Facebook.");
+
+        startListeningForMessages(api);
+
+    });
+
 };
 
 const sendMessage = async (api, messageData) => {
+
     try {
+
         const { threadID, message } = messageData;
+
         if (!message || message.trim() === "") return;
+
         api.sendMessage(message, threadID, (err) => {
-            if (err) console.error("Error sending message:", err);
+
+            if (err) console.error("❌ Error sending message:", err);
+
         });
+
     } catch (error) {
-        console.error("Error in sendMessage:", error);
+
+        console.error("❌ Error in sendMessage:", error);
+
     }
+
 };
 
-const handleMessage = async (api, event, args, sendMessage) => {
+const handleMessage = async (api, event) => {
+
     const { threadID, senderID, body } = event;
-    const message = body.toLowerCase();
-    const isAdmin = config.admins.includes(senderID);
-    const words = message.trim().split(/ +/);
-    const commandName = words[0].toLowerCase();
 
-    // Check if the user is banned
-    if (appState.bannedUsers && appState.bannedUsers.includes(senderID)) {
-        sendMessage(api, { threadID, message: 'You have been banned from using this bot.' });
-        return;
+    if (!body) return;
+
+    const message = body.trim();
+
+    const words = message.split(/ +/);
+
+    const prefix = config.Prefix[0];
+
+    loadBannedUsers();
+
+    if (bannedUsers[senderID]) {
+
+        return api.sendMessage(`⚠ You are banned from using bot commands.\nReason: ${bannedUsers[senderID].reason}`, threadID);
+
     }
 
-    // Check for the 'prefix' command specifically (no prefix needed)
-    if (commandName === 'prefix' && commands.has('prefix')) {
-        const command = commands.get('prefix');
+    let commandName = words[0].toLowerCase();
+
+    let args = words.slice(1);
+
+    let command = null;
+
+    if (message.startsWith(prefix)) {
+
+        commandName = message.slice(prefix.length).split(/ +/)[0].toLowerCase();
+
+        args = message.slice(prefix.length).split(/ +/).slice(1);
+
+        command = commands.get(commandName);
+
+    } else {
+
+        command = nonPrefixCommands.get(commandName);
+
+    }
+
+    if (command) {
+
         try {
-            await command.execute(api, event, words.slice(1), commands, prefix, config.admins, appState, sendMessage);
-        } catch (error) {
-            sendMessage(api, { threadID, message: `Error executing command: ${error.message}` });
-        }
-    } else if (message.startsWith(prefix)) { // Handle other commands (require prefix)
-        const commandName = message.slice(prefix.length).trim().split(/ +/)[0].toLowerCase();
-        const command = commands.get(commandName);
-        if (command) {
-            try {
-                await command.execute(api, event, args, commands, prefix, config.admins, appState, sendMessage);
-            } catch (error) {
-                sendMessage(api, { threadID, message: `Error executing command: ${error.message}` });
+
+            if (command.execute) {
+
+                await command.execute(api, event, args, commands, prefix, config.admins, appState, sendMessage, apiHandler, usersData, globalData);
+
+            } else if (command.run) {
+
+                await command.run({ api, event, args, apiHandler, usersData, globalData });
+
             }
-        } else {
-            sendMessage(api, { threadID, message: `Command not found: ${commandName}` });
+
+        } catch (error) {
+
+            sendMessage(api, { threadID, message: `❌ Error executing command: ${error.message}` });
+
         }
-    } else if (isAdmin) {
-        // Handle non-command messages from admins (if needed)
+
+    } else if (await tokitoSystem.executeCommand({ chat: api, event, args })) {
+
+    } else if (await cidKagenouSystem.executeCommand({ cid: api, event, args })) {
+
+    } else if (await jinwooSystem.executeCommand({ api, event })) {
+
+    } else {
+
+        await system.executeCommand({ api, event, args, apiHandler });
+
     }
+
 };
 
-const startListeningForMessages = () => {
-    api.listenMqtt(async (err, event) => {
-        if (err) {
-            console.error('Error listening for messages:', err);
-            return;
+const handleReaction = async (api, event) => {
+
+    const { messageID, userID } = event;
+
+    if (global.client.reactionListener[messageID]) {
+
+        try {
+
+            await global.client.reactionListener[messageID]({ userID, messageID });
+
+            delete global.client.reactionListener[messageID]; // Remove listener after execution
+
+        } catch (error) {
+
+            console.error("❌ Error handling reaction:", error);
+
         }
-        if (event.type === 'message') {
-            const { body, threadID, senderID } = event;
-            if (senderID === api.getCurrentUserID()) return;
-            const args = body.trim().split(/ +/);
-            await handleMessage(api, event, args, sendMessage);
-        }
-    });
+
+    }
+
 };
+
+const handleEvent = async (api, event) => {
+
+    for (const command of eventCommands) {
+
+        try {
+
+            if (command.handleEvent) await command.handleEvent({ api, event });
+
+        } catch (error) {
+
+            console.error(`❌ Error in event command '${command.config.name}':`, error);
+
+        }
+
+    }
+
+};
+
+const startListeningForMessages = (api) => {
+
+    api.listenMqtt(async (err, event) => {
+
+        if (err) {
+
+            console.error("❌ Error listening for messages:", err);
+
+            return;
+
+        }
+
+        if (event.type === "message") {
+
+            await handleMessage(api, event);
+
+        } else if (event.type === "message_reaction") {
+
+            await handleReaction(api, event);
+
+        } else {
+
+            await handleEvent(api, event);
+
+        }
+
+        if (event.type === "event" && event.logMessageType === "log:subscribe") {
+
+            const threadID = event.threadID;
+
+            const addedUsers = event.logMessageData.addedParticipants;
+
+            if (addedUsers.some(user => user.userFbId === api.getCurrentUserID())) {
+
+                return api.sendMessage(`Thank you for inviting me here!`, threadID);
+
+            }
+
+        }
+
+    });
+
+};
+
+// Start the bot
 
 startBot();
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
-});
-              
