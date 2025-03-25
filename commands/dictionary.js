@@ -13,7 +13,7 @@ module.exports = {
       });
     }
 
-    const word = args.join(" "); // Get the word
+    const word = args.join(" "); 
 
     try {
       const response = await axios.get(`https://kaiz-apis.gleeze.com/api/dictionary?word=${encodeURIComponent(word)}`);
