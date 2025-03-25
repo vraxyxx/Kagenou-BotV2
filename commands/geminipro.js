@@ -1,8 +1,8 @@
 const axios = require('axios');
 
 module.exports = {
-  name: 'geminipro',
-  category: 'AI',
+  name: 'cid',
+  category: 'Ai',
   execute: async (api, event, args, commands, prefix, admins, appState, sendMessage) => {
     const { threadID } = event;
     const query = args.join(" "); 
@@ -13,7 +13,7 @@ module.exports = {
     }
 
     try {
-      const response = await axios.get(`https://kaiz-apis.gleeze.com/api/gemini-pro?q=${encodeURIComponent(query)}&uid=1`);
+      const response = await axios.get(`https://kaiz-apis.gleeze.com/api/gpt-4o?ask=${encodeURIComponent(query)}&uid=1`);
       const data = response.data; 
 
       if (data.response) {
@@ -27,4 +27,4 @@ module.exports = {
     }
   },
 };
-                    
+

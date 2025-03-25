@@ -3,7 +3,7 @@ const os = require('os');
 module.exports = {
   name: 'uptime',
   description: 'Shows the uptime of the bot.',
-  author: 'Aljur Pogoy',
+  author: 'coffee',
   usage: '/uptime',
   async execute(api, event, args, commands, prefix, admins, appState, sendMessage) {
     const { threadID } = event;

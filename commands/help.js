@@ -1,41 +1,105 @@
-const axios = require('axios');
+const fs = require("fs");
 
-const commandCategories = {
-  "Admin": ['addadmin', 'adminlist', 'removeadmin', 'removeuser', 'ban', 'viplist'],
-  "Ai": ['ai', 'cid'],
-  "System": ['compile', 'restart', 'shadowgarden', 'uptime'],
-  "Utilities": ['help', 'notify', 'prefix', 'sendmessage',],
-  "User": ['unban', 'waifu', 'developer'],
-
-};
+const path = require("path");
 
 module.exports = {
-  name: 'help',
-  category: 'Info',
+
+  name: "help",
+
+  category: "Utility",
+
+  
+
   execute: async (api, event, args, commands, prefix, admins, appState, sendMessage) => {
+
     const { threadID } = event;
 
-    let menuMessage = "━━━━━━━━━━━━━━\n𝙰𝚟𝚊𝚒𝚕𝚊𝚋𝚕𝚎 𝙲𝚘𝚖𝚖𝚊𝚗𝚍𝚜:\n";
-    for (const category in commandCategories) {
-      if (commandCategories[category].length > 0) { //Only add categories with commands
-          menuMessage += `╭─╼━━━━━━━━╾─╮\n│ ${category}│\n`;
-          for (const command of commandCategories[category]) {
-              menuMessage += `│ > ${command}\n`;
-          }
-          menuMessage += `╰─━━━━━━━━━╾─╯\n`;
-      }
-    }
+    const mainCommandsDir = path.join(__dirname, "..", "commands");
 
-    menuMessage += `Meesage the developer if there's error on our Cid Kagenou Bot.\n`;
-    menuMessage += `Cid Kagenou Bot\n`;
-    menuMessage += `━━━━━━━━━━━━━━\nDeveloper; Aljur Pogoy \nAdmin; Ana sophia\n━━━━━━━━━━━━━━`;
+    let commandList = [];
+
+    let eventList = [];
+
+    let cmdCount = 1, eventCount = 1;
 
     try {
-      await sendMessage(api, { threadID, message: menuMessage });
+
+      const commandFiles = fs.readdirSync(mainCommandsDir).filter(file => file.endsWith(".js"));
+
+      commandFiles.forEach((file) => {
+
+        const commandPath = path.join(mainCommandsDir, file);
+
+        try {
+
+          const command = require(commandPath);
+
+          const commandName = file.replace(".js", ""); // Remove .js extension
+
+          if (typeof command !== "object" || !command.name) {
+
+            console.warn(`⚠️ Skipping invalid command file: ${file}`);
+
+            return;
+
+          }
+
+          if (command.handleEvent) {
+
+            eventList.push(`  ├──\n  | 【 ${eventCount++}. 】 ${commandName}\n  └───────────────✦`);
+
+          } else {
+
+            commandList.push(`  ├──\n  | 【 ${cmdCount++}. 】 ${commandName}\n  └───────────────✦`);
+
+          }
+
+        } catch (cmdError) {
+
+          console.error(`❌ Error loading command: ${file}`, cmdError);
+
+        }
+
+      });
+
     } catch (error) {
-      console.error("Error sending help message:", error);
-      await sendMessage(api, { threadID, message: "Error sending help. Check console logs." });
+
+      console.error("❌ Error reading commands directory:", error);
+
+      sendMessage(api, { threadID, message: "❌ Error loading command list." });
+
+      return;
+
     }
-  },
+
+    // Construct the help message
+
+    let helpMessage = "====【 Cid Kagenou Bot Commands 】====\n\n";
+
+    helpMessage += commandList.length > 0 ? commandList.join("\n") + "\n\n" : "No available commands.\n\n";
+
+    if (eventList.length > 0) {
+
+      helpMessage += "====【 Event Commands 】====\n\n";
+
+      helpMessage += eventList.join("\n") + "\n\n";
+
+    }
+
+    helpMessage += `> Thank you for using our Cid Kagenou bot, this bot has multiple system and multiple command structures.\n`;
+
+    helpMessage += `> This is the original version 2.0 of Cid bot, will release soon.\n`;
+
+    helpMessage += `> For further assistance, contact the developer,\n`;
+
+    helpMessage += `Gmail: korisawaumuzaki@gmail.com\n`;
+
+    helpMessage += `Facebook: https://www.facebook.com/aljur.pogoy.2024`;
+
+    // Send the help message
+
+    sendMessage(api, { threadID, message: helpMessage });
+
+  }
+
 };
-  

@@ -7,9 +7,9 @@ module.exports = {
             sendMessage(api, { threadID, message: 'You do not have permission to use this command.' });
             return;
         }
-        sendMessage(api, { threadID, message: 'Restarting Please wait...' });
+        sendMessage(api, { threadID, message: 'Restarting...' });
         setTimeout(() => {
-            process.exit(0);
-        }, 1000);
+            process.exit(0); // Exit the process cleanly
+        }, 1000); // Add a 1-second delay before exiting
     }
 };
