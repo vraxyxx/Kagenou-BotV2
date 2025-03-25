@@ -46,7 +46,7 @@ module.exports = {
   },
 };
 ```
-## You can make an comamnd like this
+## To create an command for tokito-system, this system is request from Francis Ownersv2 
 ```node.js
 module.exports = {
 
