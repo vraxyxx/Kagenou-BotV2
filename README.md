@@ -49,12 +49,40 @@ module.exports = {
 ## You can make an comamnd like this
 ```node.js
 module.exports = {
-  name: 'uptime',
-  description: 'Shows the uptime of the bot.',
-  author: 'Aljur Pogoy',
-  usage: '/uptime',
-  async execute(api, event, args, commands, prefix, admins, appState, sendMessage) {
-    const { threadID } = event;
+
+  manifest: {
+
+    name: "ping", 
+
+    aliases: ["p"], 
+
+    developer: "YourName", 
+
+    description: "Responds with Pong!",
+
+    usage: "/ping", 
+
+    config: {
+
+      botAdmin: false,
+
+      botModerator: false,
+
+      noPrefix: false,
+
+      privateOnly: false
+
+    }
+
+  },
+
+  async deploy({ chat }) {
+
+    chat.send("Pong! 🏓");
+
+  }
+
+};
 ```
 ## To create an command fo jinwoo-system
 ```node.js
@@ -99,7 +127,34 @@ module.exports = {
 ```
 ## To create an command for cid-kagenou-system
 ```node.js
+const axios = require("axios");
 
+module.exports = {
+    onChat: {
+        name: "ping",
+        aliases: ["latency", "pong"],
+        developer: "Aljur Pogoy",
+        description: "Check the bot's response time.",
+        usage: "ping",
+        config: {
+            cidControl: false,
+            alphaControl: false,
+            deltaControl: false,
+            zetaControl: false
+        },
+    },
+
+    async deploy({ cid }) {
+        const start = Date.now();
+
+        const message = await cid.kagenou("🏓 Pinging...");
+        const end = Date.now();
+
+        const ping = end - start;
+        cid.kagenou(`🏓 Pong! Response time: ${ping}ms`);
+    }
+};
+```
 ## To handle the non-prefix comamnd
 ```node.js
 if (commandName === 'prefix' && commands.has('prefix')) {
