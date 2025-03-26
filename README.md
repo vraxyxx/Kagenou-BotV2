@@ -1,4 +1,4 @@
-
+# Introduction 
 ## The Seven Shadows
 
 The Seven Shadows are Cid Kagenou's elite shadow organization.  Each member possesses unique skills and plays a crucial role in Cid's plans.
@@ -84,7 +84,7 @@ module.exports = {
 
 };
 ```
-## To create an command fo jinwoo-system
+## To create an command for jinwoo-system
 ```node.js
 const axios = require("axios");
 
@@ -159,7 +159,19 @@ module.exports = {
 ```node.js
 if (commandName === 'prefix' && commands.has('prefix')) {
         const command = commands.get('prefix');
+// In another way
+module.exports = {
+    name: "ping",
+    nonPrefix: true, // Handle the nonPrefix commands
+     async run ({ api, event }) => {
+
+        api.sendMessage("Pong!", event.threadID);
+
+    }
+
+};
 ```
+
 ## Put your uid in config.json
 ```node.js
 {
