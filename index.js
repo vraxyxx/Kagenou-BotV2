@@ -4,6 +4,10 @@ const path = require("path");
 
 const login = require("chatbox-fca-remake");
 
+const express = require("express");
+
+const bodyParser = require("body-parser");
+
 const system = require("./SYSTEM/second-system#1/index.js");
 
 const tokitoSystem = require("./SYSTEM/tokito-system/index.js");
@@ -360,4 +364,59 @@ const startListeningForMessages = (api) => {
     });
 
 };
-startBot();
+startBot();,
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(bodyParser.json());
+
+app.get("/api/v1/status", (req, res) => {
+    res.json({ status: botAPI ? "online" : "offline" });
+});
+
+app.post("/api/v1/send", (req, res) => {
+    if (!botAPI) return res.status(500).json({ error: "Bot is not online" });
+
+    const { threadID, message } = req.body;
+    if (!threadID || !message) return res.status(400).json({ error: "Missing threadID or message" });
+
+    botAPI.sendMessage(message, threadID, (err) => {
+        if (err) return res.status(500).json({ error: "Failed to send message" });
+
+        res.json({ success: true, message: "Message sent" });
+    });
+});
+
+app.get("/api/v1/history/:threadID", (req, res) => {
+    if (!botAPI) return res.status(500).json({ error: "Bot is not online" });
+
+    const threadID = req.params.threadID;
+    botAPI.getThreadHistory(threadID, 10, (err, history) => {
+        if (err) return res.status(500).json({ error: "Failed to get message history" });
+
+        res.json({ success: true, history });
+    });
+});
+
+app.get("/api/v1/command=/:command", async (req, res) => {
+    if (!botAPI) return res.status(500).json({ error: "Bot is not online" });
+
+    const commandName = req.params.command.toLowerCase();
+    if (commandName === "help") {
+        return res.json({ success: true, commands: [...commands.keys()] });
+    }
+
+    const command = commands.get(commandName);
+    if (!command) return res.status(404).json({ error: "Command not found" });
+
+    try {
+        const result = await command.run({ api: botAPI, args: [], event: {} });
+        res.json({ success: true, response: result || "Command executed." });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to execute command" });
+    }
+});
+
+app.listen(PORT, () => {
+    console.log(`✅ API Server running on port ${PORT}`);
+});
