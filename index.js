@@ -365,6 +365,7 @@ const startListeningForMessages = (api) => {
 
 };
 startBot();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -372,11 +373,24 @@ app.use(bodyParser.json());
 
 let botAPI = null; // Placeholder for bot instance
 
+// Load Commands Dynamically
+const commands = new Map();
+const commandsPath = path.join(__dirname, "commands");
+
+fs.readdirSync(commandsPath).forEach((file) => {
+    if (file.endsWith(".js")) {
+        const commandName = file.replace(".js", "");
+        const command = require(`./commands/${file}`);
+        commands.set(commandName, command);
+    }
+});
+
+// API: Check bot status
 app.get("/api/v1/status", (req, res) => {
     res.json({ status: botAPI ? "online" : "offline" });
 });
 
-// API to send messages
+// API: Send messages
 app.post("/api/v1/send", (req, res) => {
     if (!botAPI) return res.status(500).json({ error: "Bot is not online" });
 
@@ -385,12 +399,11 @@ app.post("/api/v1/send", (req, res) => {
 
     botAPI.sendMessage(message, threadID, (err) => {
         if (err) return res.status(500).json({ error: "Failed to send message" });
-
         res.json({ success: true, message: "Message sent" });
     });
 });
 
-// API to get message history
+// API: Get message history
 app.get("/api/v1/history/:threadID", (req, res) => {
     if (!botAPI) return res.status(500).json({ error: "Bot is not online" });
 
@@ -402,24 +415,65 @@ app.get("/api/v1/history/:threadID", (req, res) => {
     });
 });
 
-// API to execute commands dynamically
+// API: Execute bot commands dynamically
 app.get("/api/v1/command=/:command", async (req, res) => {
     if (!botAPI) return res.status(500).json({ error: "Bot is not online" });
 
     const commandName = req.params.command.toLowerCase();
+    const args = []; // Modify this if arguments are passed in the request
+    const threadID = "API_THREAD"; // Simulated thread ID for API execution
 
+    // If requesting help, return available commands
     if (commandName === "help") {
         return res.json({ success: true, commands: [...commands.keys()] });
     }
 
+    // Check if command exists
+    if (!commands.has(commandName)) {
+        return res.status(404).json({ error: "Command not found" });
+    }
+
     const command = commands.get(commandName);
-    if (!command) return res.status(404).json({ error: "Command not found" });
 
     try {
-        const result = await command.execute({ api: botAPI, args: [], event: {} });
-        res.json({ success: true, response: result || "Command executed." });
+        let result = null;
+
+        if (command.execute) {
+            result = await command.execute(
+                botAPI, 
+                { threadID }, 
+                args, 
+                commands, 
+                prefix, 
+                config.admins, 
+                appState, 
+                sendMessage, 
+                apiHandler, 
+                usersData, 
+                globalData
+            );
+        } else if (command.run) {
+            result = await command.run({ 
+                api: botAPI, 
+                event: { threadID }, 
+                args, 
+                apiHandler, 
+                usersData, 
+                globalData 
+            });
+        } else {
+            return res.status(500).json({ error: "Command does not have a valid execution method." });
+        }
+
+        res.json({
+            success: true,
+            command: commandName,
+            response: result || "Command executed successfully.",
+        });
+
     } catch (error) {
-        res.status(500).json({ error: "Failed to execute command" });
+        console.error(`Error executing command ${commandName}:`, error);
+        res.status(500).json({ error: `Failed to execute command: ${error.message}` });
     }
 });
 
