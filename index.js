@@ -364,7 +364,7 @@ const startListeningForMessages = (api) => {
     });
 
 };
-startBot();,
+startBot();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
