@@ -370,10 +370,27 @@ const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
+let botAPI = null; // Placeholder for bot instance
+
+// Automatically scan the "commands" folder
+const commands = new Map();
+const commandsPath = path.join(__dirname, "commands");
+
+fs.readdirSync(commandsPath).forEach((file) => {
+    if (file.endsWith(".js")) {
+        const commandName = file.replace(".js", "");
+        const command = require(`./commands/${file}`);
+
+        commands.set(commandName, command);
+    }
+});
+
+// API to check bot status
 app.get("/api/v1/status", (req, res) => {
     res.json({ status: botAPI ? "online" : "offline" });
 });
 
+// API to send messages
 app.post("/api/v1/send", (req, res) => {
     if (!botAPI) return res.status(500).json({ error: "Bot is not online" });
 
@@ -387,6 +404,7 @@ app.post("/api/v1/send", (req, res) => {
     });
 });
 
+// API to get message history
 app.get("/api/v1/history/:threadID", (req, res) => {
     if (!botAPI) return res.status(500).json({ error: "Bot is not online" });
 
@@ -398,10 +416,12 @@ app.get("/api/v1/history/:threadID", (req, res) => {
     });
 });
 
+// API to execute commands dynamically
 app.get("/api/v1/command=/:command", async (req, res) => {
     if (!botAPI) return res.status(500).json({ error: "Bot is not online" });
 
     const commandName = req.params.command.toLowerCase();
+
     if (commandName === "help") {
         return res.json({ success: true, commands: [...commands.keys()] });
     }
@@ -410,13 +430,14 @@ app.get("/api/v1/command=/:command", async (req, res) => {
     if (!command) return res.status(404).json({ error: "Command not found" });
 
     try {
-        const result = await command.run({ api: botAPI, args: [], event: {} });
+        const result = await command.execute({ api: botAPI, args: [], event: {} });
         res.json({ success: true, response: result || "Command executed." });
     } catch (error) {
         res.status(500).json({ error: "Failed to execute command" });
     }
 });
 
+// Start API server
 app.listen(PORT, () => {
     console.log(`✅ API Server running on port ${PORT}`);
 });
