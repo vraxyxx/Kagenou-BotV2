@@ -2,7 +2,7 @@ const fs = require("fs-extra");
 
 const path = require("path");
 
-const login = require("chatbox-fca-remake");
+const login = require("chatbox-fca-remake"); // you can change fca, only available is ws3-fca 
 
 const system = require("./SYSTEM/second-system#1/index.js");
 
@@ -83,7 +83,7 @@ const loadCommands = () => {
 
         } catch (error) {
 
-            console.error(`❌ Error loading command '${file}':`, error);
+            console.error(`âŒ Error loading command '${file}':`, error);
 
         }
 
@@ -93,9 +93,9 @@ const loadCommands = () => {
 
 loadCommands();
 
-console.log("✅ Commands loaded:", [...commands.keys()]);
+console.log("âœ… Commands loaded:", [...commands.keys()]);
 
-console.log("✅ Non-Prefix Commands:", [...nonPrefixCommands.keys()]);
+console.log("âœ… Non-Prefix Commands:", [...nonPrefixCommands.keys()]);
 
 console.log(" Event Commands:", eventCommands.map(cmd => cmd.name));
 
@@ -105,11 +105,11 @@ try {
 
     appState = JSON.parse(fs.readFileSync("./appstate.dev.json", "utf8"));
 
-    console.log("✅ appState loaded successfully.");
+    console.log("âœ… appState loaded successfully.");
 
 } catch (error) {
 
-    console.error("❌ Error loading appstate.json:", error);
+    console.error("âŒ Error loading appstate.json:", error);
 
 }
 
@@ -119,7 +119,7 @@ try {
 
 } catch (error) {
 
-    console.error("❌ Error loading config.json:", error);
+    console.error("âŒ Error loading config.json:", error);
 
 }
 
@@ -131,7 +131,7 @@ const startBot = async () => {
 
         if (err) {
 
-            console.error("❌ Fatal error during Facebook login:", err);
+            console.error("âŒ Fatal error during Facebook login:", err);
 
             process.exit(1);
 
@@ -161,7 +161,7 @@ const startBot = async () => {
 
         });
 
-        console.log("✅ Successfully logged in to Facebook.");
+        console.log("âœ… Successfully logged in to Facebook.");
 
         startListeningForMessages(api);
 
@@ -179,13 +179,13 @@ const sendMessage = async (api, messageData) => {
 
         api.sendMessage(message, threadID, (err) => {
 
-            if (err) console.error("❌ Error sending message:", err);
+            if (err) console.error("âŒ Error sending message:", err);
 
         });
 
     } catch (error) {
 
-        console.error("❌ Error in sendMessage:", error);
+        console.error("âŒ Error in sendMessage:", error);
 
     }
 
@@ -207,7 +207,7 @@ const handleMessage = async (api, event) => {
 
     if (bannedUsers[senderID]) {
 
-        return api.sendMessage(`⚠ You are banned from using bot commands.\nReason: ${bannedUsers[senderID].reason}`, threadID);
+        return api.sendMessage(`âš  You are banned from using bot commands.\nReason: ${bannedUsers[senderID].reason}`, threadID);
 
     }
 
@@ -247,7 +247,7 @@ const handleMessage = async (api, event) => {
 
         } catch (error) {
 
-            sendMessage(api, { threadID, message: `❌ Error executing command: ${error.message}` });
+            sendMessage(api, { threadID, message: `âŒ Error executing command: ${error.message}` });
 
         }
 
@@ -277,7 +277,7 @@ const handleReaction = async (api, event) => {
 
         } catch (error) {
 
-            console.error("❌ Error handling reaction:", error);
+            console.error("âŒ Error handling reaction:", error);
 
         }
 
@@ -295,7 +295,7 @@ const handleEvent = async (api, event) => {
 
         } catch (error) {
 
-            console.error(`❌ Error in event command '${command.config.name}':`, error);
+            console.error(`âŒ Error in event command '${command.config.name}':`, error);
 
         }
 
@@ -309,7 +309,7 @@ const startListeningForMessages = (api) => {
 
         if (err) {
 
-            console.error("❌ Error listening for messages:", err);
+            console.error("âŒ Error listening for messages:", err);
 
             return;
 
@@ -348,29 +348,3 @@ const startListeningForMessages = (api) => {
 };
 
 startBot();
-app.use(express.json());
-
-app.get("/api/v2/command=:command", async (req, res) => {
-    try {
-        const commandInput = req.params.command;
-        const commandArgs = commandInput.split(" ");
-        const commandName = commandArgs.shift();
-
-        let command = commands.get(commandName) || nonPrefixCommands.get(commandName);
-
-        if (!command) {
-            return res.json({ success: false, message: "Command not found" });
-        }
-
-        const response = await command.run({ args: commandArgs });
-
-        res.json({ success: true, command: commandName, output: response });
-    } catch (error) {
-        res.status(500).json({ success: false, message: "Internal Server Error", error: error.message });
-    }
-});
-
-// Start Web API Server
-app.listen(PORT, () => {
-    console.log(`✅ Web API running on http://localhost:${PORT}`);
-});
