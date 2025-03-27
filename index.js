@@ -101,13 +101,17 @@ const startBot = async () => {
             autoMarkRead: false
         });
 
-        botAPI = api; // Assign API to botAPI for Express
+        botAPI = api; // ✅ Assign botAPI AFTER successful login
 
         console.log("✅ Successfully logged in to Facebook.");
         startListeningForMessages(api);
+
+        // ✅ Start API server only when bot is online
+        app.listen(PORT, () => console.log(`✅ API Server running on port ${PORT}`));
     });
 };
 
+startBot();
 const sendMessage = async (api, messageData) => {
     try {
         const { threadID, message } = messageData;
