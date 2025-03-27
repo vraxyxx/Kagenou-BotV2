@@ -372,20 +372,6 @@ app.use(bodyParser.json());
 
 let botAPI = null; // Placeholder for bot instance
 
-// Automatically scan the "commands" folder
-const commands = new Map();
-const commandsPath = path.join(__dirname, "commands");
-
-fs.readdirSync(commandsPath).forEach((file) => {
-    if (file.endsWith(".js")) {
-        const commandName = file.replace(".js", "");
-        const command = require(`./commands/${file}`);
-
-        commands.set(commandName, command);
-    }
-});
-
-// API to check bot status
 app.get("/api/v1/status", (req, res) => {
     res.json({ status: botAPI ? "online" : "offline" });
 });
