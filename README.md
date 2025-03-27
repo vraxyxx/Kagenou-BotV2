@@ -84,7 +84,7 @@ module.exports = {
 
 };
 ```
-## To create an command for jinwoo-system
+## Coming soon, Jinwoo-system this will release on KagenouBotV3
 ```node.js
 const axios = require("axios");
 
